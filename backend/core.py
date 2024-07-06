@@ -9,7 +9,7 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain.chains import RetrievalQA
 from pinecone import Pinecone
 from langchain_community.vectorstores import Pinecone as PineconeLangChain
-
+from langchain import hub
 from consts import INDEX_NAME
 
 # pc = Pinecone
@@ -21,16 +21,18 @@ def run_llm(query: str):
         index_name=INDEX_NAME, embedding=embeddings
     )
     chat = ChatOpenAI(verbose=True, temperature=0)
-    # create_stuff_documents_chain(llm=chat, prompt=)
-    # create_retrieval_chain(retriever=docsearch.as_retriever(),)
+    retrieval_qa_chat_prompt = hub.pull("langchain-ai/retrieval-qa-chat")
+    question_answer_chain = create_stuff_documents_chain(llm=chat, prompt=retrieval_qa_chat_prompt)
+    qa = create_retrieval_chain(retriever=docsearch.as_retriever(), combine_docs_chain=question_answer_chain)
 
-    qa = RetrievalQA.from_chain_type(
-        llm=chat,
-        chain_type="stuff",
-        retriever=docsearch.as_retriever(),
-        return_source_documents=True,
-    )
-    return qa({"query": query})
+    # qa = RetrievalQA.from_chain_type(
+    #     llm=chat,
+    #     chain_type="stuff",
+    #     retriever=docsearch.as_retriever(),
+    #     return_source_documents=True,
+    # )
+    #return qa({"query": query})
+    return qa.invoke({"input": query})
 
 
 if __name__ == "__main__":

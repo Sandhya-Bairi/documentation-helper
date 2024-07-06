@@ -21,6 +21,7 @@ tqdm = "*"
 langchain-pinecone = "*"
 python-dotenv = "*"
 langchain-openai = "*"
+langchainhub = "*"
 
 [dev-packages]
 
